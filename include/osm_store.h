@@ -199,37 +199,40 @@ private:
 class UsedWays {
 
 private:
-	std::vector<bool> usedList;
+	std::map<WayID, bool> usedList;
 	mutable std::mutex mutex;
 
 public:
 	bool inited = false;
 
-	// Size the vector to a reasonable estimate, to avoid resizing on the fly
-	void reserve(bool compact, size_t numNodes) {
-		std::lock_guard<std::mutex> lock(mutex);
-		if (inited) return;
-		inited = true;
-		if (compact) {
-			// If we're running in compact mode, way count is roughly 1/9th of node count... say 1/8 to be safe
-			usedList.reserve(numNodes/8);
-		} else {
-			// Otherwise, we could have anything up to the current max node ID (approaching 2**30 in summer 2021)
-			// 2**31 is 0.25GB with a vector<bool>
-			usedList.reserve(pow(2,31));
-		}
-	}
+	// // Size the vector to a reasonable estimate, to avoid resizing on the fly
+	// void reserve(bool compact, size_t numNodes) {
+	// 	std::lock_guard<std::mutex> lock(mutex);
+	// 	if (inited) return;
+	// 	inited = true;
+	// 	if (compact) {
+	// 		// If we're running in compact mode, way count is roughly 1/9th of node count... say 1/8 to be safe
+	// 		usedList.reserve(numNodes/8);
+	// 	} else {
+	// 		// Otherwise, we could have anything up to the current max node ID (approaching 2**30 in summer 2021)
+	// 		// 2**31 is 0.25GB with a vector<bool>
+	// 		usedList.reserve(pow(2,31));
+	// 	}
+	// }
 	
 	// Mark a way as used
 	void insert(WayID wayid) {
 		std::lock_guard<std::mutex> lock(mutex);
-		if (wayid>usedList.size()) usedList.resize(wayid+256);
 		usedList[wayid] = true;
 	}
 	
 	// See if a way is used
 	bool at(WayID wayid) const {
-		return (wayid>usedList.size()) ? false : usedList[wayid];
+		if (usedList.find(wayid) != usedList.end()) {
+			return usedList.at(wayid);
+		} else {
+			return false;
+		}
 	}
 	
 	void clear() {
@@ -501,9 +504,9 @@ public:
 
 	void mark_way_used(WayID i) { used_ways.insert(i); }
 	bool way_is_used(WayID i) { return used_ways.at(i); }
-	void ensure_used_ways_inited() {
-		if (!used_ways.inited) used_ways.reserve(use_compact_nodes, nodes_size());
-	}
+	// void ensure_used_ways_inited() {
+	// 	if (!used_ways.inited) used_ways.reserve(use_compact_nodes, nodes_size());
+	// }
 	
 	using tag_map_t = boost::container::flat_map<std::string, std::string>;
 	void relation_contains_way(WayID relid, WayID wayid) { scanned_relations.relation_contains_way(relid,wayid); }
