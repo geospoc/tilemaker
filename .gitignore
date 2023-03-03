@@ -13,3 +13,4 @@ include/osmformat.pb.h
 include/vector_tile.pb.h
 
 build/
+.DS_Store
