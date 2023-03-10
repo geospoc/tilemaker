@@ -249,7 +249,6 @@ bool PbfReader::ReadBlock(std::istream &infile, OsmLuaProcessing &output, std::p
 		}
 
 		if(phase == ReadPhase::RelationScan || phase == ReadPhase::All) {
-			// osmStore.ensure_used_ways_inited();
 			bool done = ScanRelations(output, pg, pb);
 			if(done) { 
 				std::cout << "(Scanning for ways used in relations: " << (100*progress.first/progress.second) << "%)\r";
