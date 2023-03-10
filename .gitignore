@@ -12,5 +12,12 @@ tilemaker
 include/osmformat.pb.h
 include/vector_tile.pb.h
 
+# build directory
 build/
+
+# cmake files
+CMakeCache.txt
+CMakeFiles
+
+# macOS
 .DS_Store
